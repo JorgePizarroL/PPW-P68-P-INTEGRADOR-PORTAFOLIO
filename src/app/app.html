@@ -7,7 +7,36 @@
     <li><a href="#proyectos">Proyectos</a></li>
     <li><a href="#contacto">Contacto</a></li>
   </ul>
+  <div class="nav-auth">
+    @if (authService.currentUser()) {
+      <span class="user-email">{{ authService.currentUser()?.email }}</span>
+      <button class="btn-logout" (click)="logout()">Cerrar sesión</button>
+    } @else {
+      <button class="btn-login" (click)="mostrarLogin = true">Iniciar sesión</button>
+    }
+  </div>
 </nav>
+
+<!-- MODAL LOGIN/REGISTRO -->
+@if (mostrarLogin) {
+  <div class="modal-overlay" (click)="mostrarLogin = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2>{{ modoRegistro ? 'Crear cuenta' : 'Iniciar sesión' }}</h2>
+      @if (errorAuth) {
+        <p class="error">{{ errorAuth }}</p>
+      }
+      <input type="email" placeholder="Correo electrónico" [(ngModel)]="emailAuth" />
+      <input type="password" placeholder="Contraseña" [(ngModel)]="passwordAuth" />
+      <button class="btn-primary" (click)="submitAuth()">
+        {{ modoRegistro ? 'Registrarse' : 'Entrar' }}
+      </button>
+      <p class="toggle-auth" (click)="modoRegistro = !modoRegistro">
+        {{ modoRegistro ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate' }}
+      </p>
+      <button class="btn-cerrar" (click)="mostrarLogin = false">✕</button>
+    </div>
+  </div>
+}
 
 <section class="hero" id="inicio">
   <div class="hero-content">
@@ -73,13 +102,27 @@
 <section class="section section-dark" id="contacto">
   <h2 class="section-title">Contacto</h2>
   <div class="contact-container">
-    <p>¿Tienes un proyecto en mente? ¡Contáctanos!</p>
-    <div class="contact-form">
-      <input type="text" placeholder="Tu nombre" />
-      <input type="email" placeholder="Tu correo" />
-      <textarea placeholder="Describe tu proyecto..."></textarea>
-      <button class="btn-primary">Enviar Solicitud</button>
-    </div>
+    @if (solicitudEnviada) {
+      <div class="success-msg">✅ Solicitud enviada correctamente</div>
+    } @else {
+      <p>¿Tienes un proyecto en mente? ¡Contáctanos!</p>
+      @if (!authService.currentUser()) {
+        <p class="auth-required">Debes <span (click)="mostrarLogin = true">iniciar sesión</span> para enviar una solicitud</p>
+      } @else {
+        <div class="contact-form">
+          <input type="text" placeholder="Tu nombre" [(ngModel)]="solicitud.nombre" />
+          <input type="email" placeholder="Tu correo" [(ngModel)]="solicitud.correo" />
+          <textarea placeholder="Describe tu proyecto..." [(ngModel)]="solicitud.descripcion"></textarea>
+          <select [(ngModel)]="solicitud.programadorId">
+            <option value="">Selecciona un programador</option>
+            @for (p of programadores(); track p.id) {
+              <option [value]="p.id">{{ p.nombre }}</option>
+            }
+          </select>
+          <button class="btn-primary" (click)="enviarSolicitud()">Enviar Solicitud</button>
+        </div>
+      }
+    }
   </div>
 </section>
 
