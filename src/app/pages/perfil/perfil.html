@@ -17,8 +17,12 @@
       <a routerLink="/" class="back-link">← Volver al portafolio</a>
       <div class="perfil-hero">
         <div class="avatar-lg">
+          @if (programador().foto?.url) {
+            <img [src]="'http://localhost:1337' + programador().foto.url" [alt]="programador().nombre" />
+          } @else {
           {{ programador().nombre?.charAt(0) }}{{ programador().nombre?.split(' ')[1]?.charAt(0) }}
-        </div>
+          }
+</div>
         <div class="perfil-info">
           <h1>{{ programador().nombre }}</h1>
           <p class="especialidad">{{ programador().especialidad }}</p>
