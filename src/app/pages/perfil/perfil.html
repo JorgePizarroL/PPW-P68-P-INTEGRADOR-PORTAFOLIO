@@ -1,0 +1,85 @@
+<app-navbar (abrirLogin)="mostrarLogin = true"></app-navbar>
+
+@if (cargando()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando perfil...</p>
+  </div>
+} @else if (!programador()) {
+  <div class="not-found">
+    <h2>Programador no encontrado</h2>
+    <a routerLink="/" class="btn-primary">Volver al inicio</a>
+  </div>
+} @else {
+  <div class="perfil-wrapper">
+    <!-- HEADER DEL PERFIL -->
+    <div class="perfil-header">
+      <a routerLink="/" class="back-link">← Volver al portafolio</a>
+      <div class="perfil-hero">
+        <div class="avatar-lg">
+          {{ programador().nombre?.charAt(0) }}{{ programador().nombre?.split(' ')[1]?.charAt(0) }}
+        </div>
+        <div class="perfil-info">
+          <h1>{{ programador().nombre }}</h1>
+          <p class="especialidad">{{ programador().especialidad }}</p>
+          <p class="descripcion-breve">{{ programador().descripcionBreve }}</p>
+          <div class="social-links">
+            @if (programador().github) {
+              <a [href]="programador().github" target="_blank" class="social-btn">
+                <span>⌥</span> GitHub
+              </a>
+            }
+            @if (programador().linkedin) {
+              <a [href]="programador().linkedin" target="_blank" class="social-btn linkedin">
+                <span>in</span> LinkedIn
+              </a>
+            }
+            @if (programador().correo) {
+              <a [href]="'mailto:' + programador().correo" class="social-btn email">
+                ✉ Contactar
+              </a>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESCRIPCIÓN COMPLETA -->
+    @if (programador().descripcionCompleta) {
+      <section class="perfil-section">
+        <h2>Sobre mí</h2>
+        <p class="desc-completa">{{ getTexto(programador().descripcionCompleta) }}</p>
+      </section>
+    }
+
+    <!-- PROYECTOS -->
+    <section class="perfil-section">
+      <h2>Proyectos ({{ proyectos().length }})</h2>
+      @if (proyectos().length === 0) {
+        <p class="empty-state">Este programador aún no tiene proyectos registrados en el CMS.</p>
+      } @else {
+        <div class="proyectos-grid">
+          @for (p of proyectos(); track p.id) {
+            <div class="project-card">
+              <div class="project-type">{{ p.tipo }}</div>
+              <h3>{{ p.nombre }}</h3>
+              <p>{{ p.descripcionBreve }}</p>
+              @if (p.descripcionCompleta) {
+                <p class="desc-extra">{{ getTexto(p.descripcionCompleta) }}</p>
+              }
+              <div class="tech-tags">
+                @for (tech of getTecnologias(p); track tech) {
+                  <span>{{ tech }}</span>
+                }
+              </div>
+              <div class="project-links">
+                @if (p.repositorio) { <a [href]="p.repositorio" target="_blank">GitHub</a> }
+                @if (p.demo) { <a [href]="p.demo" target="_blank">Demo</a> }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  </div>
+}

@@ -1,0 +1,103 @@
+<app-navbar (abrirLogin)="mostrarLogin = true"></app-navbar>
+
+<div class="solicitudes-wrapper">
+  @if (!authService.currentUser()) {
+    <div class="no-auth">
+      <div class="no-auth-icon">🔒</div>
+      <h2>Acceso restringido</h2>
+      <p>Debes iniciar sesión para ver tus solicitudes.</p>
+      <button class="btn-primary" (click)="mostrarLogin = true">Iniciar sesión</button>
+      <a routerLink="/" class="btn-outline">Volver al inicio</a>
+    </div>
+  } @else if (cargando()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando solicitudes...</p>
+    </div>
+  } @else {
+    <div class="header-row">
+      <div>
+        <h1>
+          @if (esProgramador) {
+            Solicitudes recibidas
+          } @else {
+            Mis solicitudes
+          }
+        </h1>
+        <p class="header-sub">
+          @if (esProgramador) {
+            <span class="badge-prog">👨‍💻 Programador</span>
+            Vista de {{ programadorActual?.nombre }} — {{ solicitudes().length }} solicitud(es)
+          } @else {
+            <span class="badge-user">👤 Usuario externo</span>
+            {{ solicitudes().length }} solicitud(es) enviadas
+          }
+        </p>
+      </div>
+      <a routerLink="/" class="btn-outline">← Volver</a>
+    </div>
+
+    @if (solicitudes().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        @if (esProgramador) {
+          <p>Aún no tienes solicitudes recibidas.</p>
+        } @else {
+          <p>Aún no has enviado ninguna solicitud.</p>
+          <a routerLink="/" fragment="contacto" class="btn-primary">Enviar una solicitud</a>
+        }
+      </div>
+    } @else {
+      <div class="solicitudes-list">
+        @for (s of solicitudes(); track s.id) {
+          <div class="solicitud-card" [class.respondida]="s.estado === 'Respondida'">
+            <div class="solicitud-header">
+              <div class="solicitud-meta">
+                <span class="badge" [class.pendiente]="s.estado === 'Pendiente'" [class.resp]="s.estado === 'Respondida'">
+                  {{ s.estado }}
+                </span>
+                <span class="fecha">{{ formatFecha(s.fechaCreacion) }}</span>
+              </div>
+              @if (esProgramador) {
+                <span class="de-quien">De: <strong>{{ s.nombre }}</strong> ({{ s.correoUsuario }})</span>
+              } @else {
+                <span class="de-quien">Para: <strong>{{ s.nombreProgramador }}</strong></span>
+              }
+            </div>
+
+            <p class="solicitud-desc">{{ s.descripcion }}</p>
+
+            @if (s.respuesta && !s._editando) {
+              <div class="respuesta-box">
+                <p class="respuesta-label">✅ Respuesta del programador:</p>
+                <p>{{ s.respuesta }}</p>
+              </div>
+            }
+
+            @if (esProgramador) {
+              @if (s._editando) {
+                <div class="respuesta-form">
+                  <textarea
+                    [(ngModel)]="s._respuesta"
+                    placeholder="Escribe tu respuesta u observación..."
+                    rows="3">
+                  </textarea>
+                  <div class="form-actions">
+                    <button class="btn-primary" (click)="guardarRespuesta(s)" [disabled]="guardando() === s.id">
+                      {{ guardando() === s.id ? 'Guardando...' : 'Guardar respuesta' }}
+                    </button>
+                    <button class="btn-cancel" (click)="toggleEditar(s)">Cancelar</button>
+                  </div>
+                </div>
+              } @else {
+                <button class="btn-responder" (click)="toggleEditar(s)">
+                  {{ s.respuesta ? '✏️ Editar respuesta' : '💬 Responder' }}
+                </button>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

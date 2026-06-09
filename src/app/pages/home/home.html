@@ -1,0 +1,161 @@
+<app-navbar (abrirLogin)="mostrarLogin = true"></app-navbar>
+
+<!-- MODAL LOGIN/REGISTRO -->
+@if (mostrarLogin) {
+  <div class="modal-overlay" (click)="mostrarLogin = false">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <button class="btn-cerrar" (click)="mostrarLogin = false">✕</button>
+      <h2>{{ modoRegistro ? 'Crear cuenta' : 'Iniciar sesión' }}</h2>
+      <p class="modal-sub">{{ modoRegistro ? 'Solo para usuarios externos' : 'Ingresa con tu cuenta' }}</p>
+      @if (errorAuth) {
+        <p class="error">{{ errorAuth }}</p>
+      }
+      <input type="email" placeholder="Correo electrónico" [(ngModel)]="emailAuth" (keyup.enter)="submitAuth()" />
+      <input type="password" placeholder="Contraseña" [(ngModel)]="passwordAuth" (keyup.enter)="submitAuth()" />
+      <button class="btn-primary" (click)="submitAuth()" [disabled]="cargandoAuth">
+        {{ cargandoAuth ? 'Procesando...' : (modoRegistro ? 'Registrarse' : 'Entrar') }}
+      </button>
+      <p class="toggle-auth" (click)="modoRegistro = !modoRegistro; errorAuth = ''">
+        {{ modoRegistro ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate' }}
+      </p>
+    </div>
+  </div>
+}
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-content">
+    <div class="hero-badge">Portafolio Profesional</div>
+    <h1>Bienvenido a nuestro<br><span class="hero-accent">DevPortfolio</span></h1>
+    <p>Somos estudiantes de Computación de la UPS especializados en desarrollo web moderno con Angular, Firebase y tecnologías cloud.</p>
+    <div class="hero-ctas">
+      <a href="#programadores" class="btn-primary">Conoce al equipo</a>
+      <a href="#proyectos" class="btn-outline">Ver proyectos</a>
+    </div>
+    @if (!authService.currentUser()) {
+      <p class="hero-auth-hint">
+        <span (click)="mostrarLogin = true; modoRegistro = false">Inicia sesión</span> o
+        <span (click)="mostrarLogin = true; modoRegistro = true">regístrate</span> para contactarnos
+      </p>
+    } @else {
+      <p class="hero-auth-hint logged">✓ Sesión iniciada como {{ authService.currentUser()?.email }}</p>
+    }
+  </div>
+</section>
+
+<!-- PROGRAMADORES -->
+<section class="section" id="programadores">
+  <h2 class="section-title">Nuestro Equipo</h2>
+  <p class="section-sub">Haz clic en un perfil para ver sus proyectos</p>
+  <div class="cards-container">
+    @for (p of programadores(); track p.id) {
+      <a class="card card-link" [routerLink]="['/programador', p.slug ?? p.id]">
+        <div class="card-avatar">{{ p.nombre?.charAt(0) }}{{ p.nombre?.split(' ')[1]?.charAt(0) }}</div>
+        <h3>{{ p.nombre }}</h3>
+        <p class="especialidad">{{ p.especialidad }}</p>
+        <p class="card-desc">{{ p.descripcionBreve }}</p>
+        <div class="social-links" (click)="$event.stopPropagation(); $event.preventDefault()">
+          @if (p.github) { <a [href]="p.github" target="_blank">GitHub</a> }
+          @if (p.linkedin) { <a [href]="p.linkedin" target="_blank">LinkedIn</a> }
+        </div>
+        <span class="ver-perfil">Ver perfil completo →</span>
+      </a>
+    }
+    @if (programadores().length === 0) {
+      <p class="empty-state">Cargando equipo desde Strapi...</p>
+    }
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section class="section section-dark" id="servicios">
+  <h2 class="section-title">Servicios</h2>
+  <div class="cards-container">
+    @for (s of servicios(); track s.id) {
+      <div class="service-card">
+        <div class="service-icon">{{ s.icono ?? '⚙️' }}</div>
+        <h3>{{ s.nombre }}</h3>
+        <p>{{ s.descripcion }}</p>
+      </div>
+    }
+    @if (servicios().length === 0) {
+      <p class="empty-state" style="color:#94a3b8">Cargando servicios...</p>
+    }
+  </div>
+</section>
+
+<!-- PROYECTOS DESTACADOS -->
+<section class="section" id="proyectos">
+  <h2 class="section-title">Proyectos Destacados</h2>
+  <p class="section-sub">Proyectos marcados como destacados en el CMS</p>
+  <div class="cards-container">
+    @for (p of proyectos(); track p.id) {
+      <div class="project-card">
+        <div class="project-type">{{ p.tipo }}</div>
+        <h3>{{ p.nombre }}</h3>
+        <p>{{ p.descripcionBreve }}</p>
+        @if (getProgramadoresDelProyecto(p)) {
+          <p class="project-team">👥 {{ getProgramadoresDelProyecto(p) }}</p>
+        }
+        <div class="tech-tags">
+          @for (tech of getTecnologias(p); track tech) {
+            <span>{{ tech }}</span>
+          }
+        </div>
+        <div class="project-links">
+          @if (p.repositorio) { <a [href]="p.repositorio" target="_blank">GitHub</a> }
+          @if (p.demo) { <a [href]="p.demo" target="_blank">Demo</a> }
+        </div>
+      </div>
+    }
+    @if (proyectos().length === 0) {
+      <p class="empty-state">No hay proyectos destacados aún.</p>
+    }
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="section section-dark" id="contacto">
+  <h2 class="section-title">Contáctanos</h2>
+  <div class="contact-container">
+    @if (solicitudEnviada) {
+      <div class="success-msg">
+        <div class="success-icon">✅</div>
+        <h3>¡Solicitud enviada!</h3>
+        <p>Te contactaremos pronto.</p>
+        <button class="btn-primary" (click)="solicitudEnviada = false">Enviar otra</button>
+      </div>
+    } @else {
+      <p class="contact-intro">¿Tienes un proyecto en mente? Contáctanos directamente.</p>
+      @if (!authService.currentUser()) {
+        <div class="auth-required">
+          <p>Debes iniciar sesión para enviar una solicitud</p>
+          <button class="btn-primary" (click)="mostrarLogin = true">Iniciar sesión</button>
+          <button class="btn-outline-light" (click)="mostrarLogin = true; modoRegistro = true">Crear cuenta</button>
+        </div>
+      } @else {
+        <div class="contact-form">
+          <input type="text" placeholder="Tu nombre *" [(ngModel)]="solicitud.nombre" />
+          <input type="email" placeholder="Tu correo *" [(ngModel)]="solicitud.correo" />
+          <select [(ngModel)]="solicitud.programadorId">
+            <option value="">Selecciona un programador *</option>
+            @for (p of programadores(); track p.id) {
+              <option [value]="p.id">{{ p.nombre }} — {{ p.especialidad }}</option>
+            }
+          </select>
+          <textarea placeholder="Describe tu proyecto o idea *" [(ngModel)]="solicitud.descripcion" rows="4"></textarea>
+          <button class="btn-primary"
+            (click)="enviarSolicitud()"
+            [disabled]="!solicitud.nombre || !solicitud.correo || !solicitud.programadorId || !solicitud.descripcion">
+            Enviar Solicitud
+          </button>
+        </div>
+      }
+    }
+  </div>
+</section>
+
+<footer class="footer">
+  <p>© 2026 DevPortfolio — UPS Computación</p>
+  <p class="footer-sub">Desarrollado con Angular · Firebase · Strapi</p>
+</footer>
