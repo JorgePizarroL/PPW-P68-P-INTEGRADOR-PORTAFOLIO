@@ -142,8 +142,4 @@ firebase deploy
 - **Rich text (blocks) de Strapi** — el campo `descripcionCompleta` devuelve un array de bloques en lugar de texto plano, requiriendo una función de extracción de texto.
 - **Scroll en Angular SPA** — los enlaces de ancla del navbar requieren scroll programático con `scrollIntoView` en lugar de `href="#seccion"`.
 
----
 
-**Docente:** Ing. Pablo Torres  
-**Carrera:** Computación — UPS  
-**Período:** Marzo–Agosto 2026
