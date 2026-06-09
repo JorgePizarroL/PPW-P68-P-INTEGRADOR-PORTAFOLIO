@@ -90,4 +90,13 @@ export class HomeComponent implements OnInit {
     const progs = p.programadors?.data ?? p.programadors ?? [];
     return progs.map((x: any) => x.nombre ?? x.attributes?.nombre ?? '').filter(Boolean).join(', ');
   }
+
+  async loginGoogle() {
+  try {
+    await this.authService.loginConGoogle();
+    this.mostrarLogin = false;
+  } catch (error: any) {
+    this.errorAuth = 'No se pudo iniciar sesión con Google.';
+  }
+  }
 }

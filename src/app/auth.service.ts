@@ -4,6 +4,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
   User
 } from 'firebase/auth';
 import { auth } from './firebase.config';
@@ -26,7 +28,22 @@ export class AuthService {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
+  loginConGoogle() {
+    const provider = new GoogleAuthProvider();
+    return signInWithPopup(auth, provider);
+  }
+
   logout() {
     return signOut(auth);
+  }
+
+  esProgramador(email: string | null | undefined, programadores: any[]): boolean {
+    if (!email) return false;
+    return programadores.some(p => p.correo?.toLowerCase() === email.toLowerCase());
+  }
+
+  getProgramadorActual(email: string | null | undefined, programadores: any[]): any {
+    if (!email) return null;
+    return programadores.find(p => p.correo?.toLowerCase() === email.toLowerCase()) || null;
   }
 }

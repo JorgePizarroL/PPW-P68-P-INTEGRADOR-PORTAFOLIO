@@ -4,6 +4,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
   User
 } from 'firebase/auth';
 import { auth } from './firebase.config';
@@ -26,12 +28,15 @@ export class AuthService {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
+  loginConGoogle() {
+    const provider = new GoogleAuthProvider();
+    return signInWithPopup(auth, provider);
+  }
+
   logout() {
     return signOut(auth);
   }
 
-  // Lista de emails registrados como programadores en Firebase
-  // Se comparan con los correos que vienen de Strapi
   esProgramador(email: string | null | undefined, programadores: any[]): boolean {
     if (!email) return false;
     return programadores.some(p => p.correo?.toLowerCase() === email.toLowerCase());

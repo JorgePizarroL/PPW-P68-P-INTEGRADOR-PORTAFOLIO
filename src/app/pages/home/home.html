@@ -18,6 +18,11 @@
       <p class="toggle-auth" (click)="modoRegistro = !modoRegistro; errorAuth = ''">
         {{ modoRegistro ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate' }}
       </p>
+      <div class="divider">o</div>
+        <button class="btn-google" (click)="loginGoogle()">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" />
+          Continuar con Google
+        </button>
     </div>
   </div>
 }
