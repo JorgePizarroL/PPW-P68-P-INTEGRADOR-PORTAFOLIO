@@ -11,11 +11,11 @@ import { AuthService } from '../../services/auth.service';
     <nav class="navbar">
       <a class="nav-brand" routerLink="/">DevPortfolio</a>
       <ul class="nav-links">
-        <li><a routerLink="/" fragment="inicio">Inicio</a></li>
-        <li><a routerLink="/" fragment="programadores">Equipo</a></li>
-        <li><a routerLink="/" fragment="servicios">Servicios</a></li>
-        <li><a routerLink="/" fragment="proyectos">Proyectos</a></li>
-        <li><a routerLink="/" fragment="contacto">Contacto</a></li>
+        <li><a (click)="scrollTo('inicio')">Inicio</a></li>
+        <li><a (click)="scrollTo('programadores')">Equipo</a></li>
+        <li><a (click)="scrollTo('servicios')">Servicios</a></li>
+        <li><a (click)="scrollTo('proyectos')">Proyectos</a></li>
+        <li><a (click)="scrollTo('contacto')">Contacto</a></li>
         @if (authService.currentUser()) {
           <li><a routerLink="/solicitudes">Mis solicitudes</a></li>
         }
@@ -78,4 +78,13 @@ import { AuthService } from '../../services/auth.service';
 export class NavbarComponent {
   @Output() abrirLogin = new EventEmitter<void>();
   constructor(public authService: AuthService) {}
+
+  scrollTo(id: string) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      window.location.href = '/#' + id;
+    }
+  }
 }
