@@ -52,4 +52,11 @@ export class PerfilComponent implements OnInit {
   }
   return '';
   }
+
+  getFotoUrl(foto: any): string {
+    if (!foto) return '';
+    const url = foto.url ?? '';
+    if (url.startsWith('http')) return url;
+    return 'https://unwavering-bell-d43f7faab0.strapiapp.com' + url;
+  }
 }

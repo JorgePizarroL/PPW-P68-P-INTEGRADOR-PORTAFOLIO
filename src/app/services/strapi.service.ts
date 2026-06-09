@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
-const STRAPI = 'http://localhost:1337';
+const STRAPI = 'https://unwavering-bell-d43f7faab0.strapiapp.com';
 
 @Injectable({ providedIn: 'root' })
 export class StrapiService {
